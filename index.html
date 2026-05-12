@@ -426,6 +426,7 @@ button.is-active {
 .video-title {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
   padding: 10px 12px;
   color: var(--muted);
@@ -433,11 +434,79 @@ button.is-active {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+.video-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .video-frame {
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 0;
   display: block;
+}
+.video-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--line);
+}
+.video-step {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  min-height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+}
+.video-step[disabled] {
+  opacity: 0.35;
+  cursor: default;
+}
+.video-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 1;
+}
+.video-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  min-height: 9px;
+  padding: 0;
+  border-radius: 50%;
+  border-color: var(--line-strong);
+  background: rgba(148, 163, 184, 0.22);
+}
+.video-dot.is-active {
+  background: var(--brand);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(66, 211, 146, 0.13);
+}
+.instructions {
+  margin: 0 0 16px;
+  padding: 16px 18px;
+}
+.instructions summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 800;
+}
+.instructions ol {
+  margin: 12px 0 0;
+  padding-left: 22px;
+  color: var(--muted);
+}
+.instructions li + li {
+  margin-top: 8px;
+}
+.instructions code {
+  color: #dfffee;
 }
 .quick-filters {
   display: flex;
@@ -495,6 +564,8 @@ button.is-active {
   .actions { align-items: stretch; }
   .action-group { width: 100%; }
   button { flex: 1 1 auto; }
+  .video-step { flex: 0 0 34px; }
+  .video-dot { flex: 0 0 9px; }
 }
 </style>
 </head>
@@ -520,7 +591,7 @@ button.is-active {
     <div class="actions">
       <div class="action-group">
         <button id="clearBtn" type="button" data-tip="Reset search, filters, sort, and view options.">Clear filters</button>
-        <button id="videoBtn" type="button" data-tip="Show or hide embedded YouTube videos for the matching technology area.">Show videos</button>
+        <button id="videoBtn" type="button" data-tip="Show or hide embedded YouTube videos for each offering on the card.">Hide videos</button>
         <button id="compactBtn" type="button" data-tip="Switch between roomy cards and a denser scanning layout.">Compact view</button>
         <button id="exportBtn" type="button" data-tip="Download the currently visible records as a CSV file.">Export visible CSV</button>
       </div>
@@ -534,10 +605,31 @@ button.is-active {
     </div>
   </div>
 
+  <details class="panel instructions">
+    <summary data-tip="Step-by-step maintenance notes are kept in this file so the directory can be updated without hunting for separate documentation.">How to add a new vendor entry</summary>
+    <ol>
+      <li>Open this HTML file and find the JSON block marked <code>&lt;script id="records-data" type="application/json"&gt;</code>.</li>
+      <li>Copy one full record object, paste it before the closing <code>]</code>, and give it the next unused numeric <code>id</code>.</li>
+      <li>Fill in <code>category</code>, <code>subcategory</code>, <code>vendor</code>, <code>contact</code>, <code>phone</code>, <code>mobile</code>, <code>email</code>, <code>website</code>, <code>offerings</code>, and <code>notes</code>. Use an array for any field with more than one value.</li>
+      <li>Find the JavaScript object named <code>videoCatalog</code> and add a matching key for the same <code>id</code>. Add one video object for each offering: <code>{ offering: "Offering Name", id: "YouTubeVideoId", label: "Short title" }</code>.</li>
+      <li>Use only the YouTube video id, not the full URL. For example, from <code>https://www.youtube.com/watch?v=abc123</code>, use <code>abc123</code>.</li>
+      <li>Save the file, refresh the browser, then confirm search, filters, and the video carousel work for the new entry.</li>
+    </ol>
+  </details>
+
   <div id="cards" class="cards"></div>
   <div id="empty" class="panel empty">No matching records.</div>
 </div>
 
+<!--
+  Maintenance instructions:
+  1. Add one JSON object per vendor entry.
+  2. Use the next unused numeric id.
+  3. Use arrays for fields with multiple values, especially offerings.
+  4. After adding a record here, add a matching id in the videoCatalog object below.
+  5. Add one videoCatalog item per offering, using only the YouTube video id.
+  6. Save, refresh, and test search, filters, and the video carousel.
+-->
 <script id="records-data" type="application/json">
 [
   {
@@ -1541,7 +1633,7 @@ button.is-active {
   var raw = document.getElementById('records-data').textContent || '[]';
   var records = JSON.parse(raw);
   var state = {
-    showVideos: false,
+    showVideos: true,
     compact: false
   };
 
@@ -1570,20 +1662,630 @@ button.is-active {
   };
 
   var videoCatalog = {
-    'Dense Piece Storage': { id: 'TSTs6pK70C8', label: 'Vertical lift module overview' },
-    'Dense Tote/Case Storage': { id: 'zbtG5TTxy0c', label: 'Automated tote/case shuttle overview' },
-    'Dense Pallet Storage': { id: 'UlXZYY53jv8', label: 'Pallet shuttle system overview' },
-    'Goods-to-Person': { id: 'iHC9ec591lI', label: 'Goods-to-person automation overview' },
-    'Mobile Racking Systems': { id: 'V0EhTQ2EuP8', label: 'Mobile racking system overview' },
-    'Fixed Conveyance': { id: 'vuZEBjaR4b4', label: 'Warehouse conveyor overview' },
-    'Mobile Conveyance': { id: 'qahujJ-8vdk', label: 'AMR and AGV comparison' },
-    'Packaging': { id: 'lrE6FKRJ7Ys', label: 'Packaging automation overview' },
-    'Identification': { id: 'cblm3kxAmsE', label: 'Warehouse identification overview' },
-    'Safety': { id: 'bXfuZ2jcds4', label: 'Machine guarding and interlock overview' },
-    'Vision': { id: '0Snnn6hp6yQ', label: 'Machine vision overview' },
-    'Robotic Picking': { id: 'UtBa9yVZBJM', label: 'Robotic picking overview' },
-    'Robotic Packing': { id: '8Gp7i2WkpEw', label: 'Robotic packing overview' },
-    'Robotic Palletizing': { id: 'xvZ2nGJP1PA', label: 'Robotic palletizing overview' }
+    "1": [
+      {
+        "offering": "Vertical Lift Module",
+        "id": "nh2q22Gl2XE",
+        "label": "ASRS Automated Shuttle XP Vertical Lift Module by KardexRemstar"
+      },
+      {
+        "offering": "Vertical Carousel",
+        "id": "glPtzVmp-I4",
+        "label": "Vertical Carousel Sterile Core Storage System Automated Inventory"
+      }
+    ],
+    "2": [
+      {
+        "offering": "Compact Buffer",
+        "id": "fsyKR2K9rDE",
+        "label": "ASRS Technologies Overview: From Vertical Carousels to Robotic Systems | Kardex"
+      }
+    ],
+    "3": [
+      {
+        "offering": "Roboshuttle",
+        "id": "Gyf7zLQ-pRs",
+        "label": "RoboShuttle V5 | End-to-End Tote-to-Person Automation by Geek+"
+      }
+    ],
+    "4": [
+      {
+        "offering": "Perfect Pick",
+        "id": "Vs4RxWGrqZg",
+        "label": "Perfect Pick Product Quick Glance in 60 Seconds"
+      },
+      {
+        "offering": "Perfect Pick HD",
+        "id": "ZYNWee-LLNs",
+        "label": "Opex Infinity Robotic Goods-to-Man Picking System World Premier @ Modex 2022"
+      }
+    ],
+    "5": [
+      {
+        "offering": "HaiPick Climb",
+        "id": "Q8UaCWFojhc",
+        "label": "HaiPick Climb: Simplifying Warehouse Automation with the Revolutionary HaiClimber Robot"
+      }
+    ],
+    "6": [
+      {
+        "offering": "Shuttle System",
+        "id": "wGNfa4_rTHI",
+        "label": "3D Automated Pallet Shuttle - Interlake Mecalux"
+      },
+      {
+        "offering": "Mini-Load System",
+        "id": "MtX8sEO3ZDU",
+        "label": "Warehouse automation British Sugar UK"
+      }
+    ],
+    "7": [
+      {
+        "offering": "SkyCube",
+        "id": "7jOJ4I6x04k",
+        "label": "LogiMAT 2026: Geek+ SkyCube & RoboShuttle Solutions in Action"
+      }
+    ],
+    "8": [
+      {
+        "offering": "ONE",
+        "id": "zSMy5oecA4U",
+        "label": "Two Technologies. One Goal: Smarter Warehousing | HUAYIDE ASRS Solutions"
+      },
+      {
+        "offering": "DUO",
+        "id": "UlXZYY53jv8",
+        "label": "Pallet Shuttle System Presentation"
+      },
+      {
+        "offering": "+Crane",
+        "id": "Ji64UATdPss",
+        "label": "Four Way Pallet Shuttle for Automated Storage System | Multilevel AS/RS for Pallet Storage"
+      }
+    ],
+    "9": [
+      {
+        "offering": "Atlas",
+        "id": "0imOAIzNxo4",
+        "label": "Movu atlas - Scalable AS/RS System for Highest Storage Density"
+      }
+    ],
+    "10": [
+      {
+        "offering": "Pallet Shuttle",
+        "id": "5IwbE5Kc6g8",
+        "label": "Pallet Shuttle, basic operating procedures - Interlake Mecalux"
+      },
+      {
+        "offering": "Automated Pallet Shuttle",
+        "id": "SpNV5WjRqck",
+        "label": "Pallet shuttle system in the logistics of healthcare products - Interlake Mecalux"
+      },
+      {
+        "offering": "3D Automated Pallet Shuttle",
+        "id": "DcBHEWYXJkc",
+        "label": "Discover Interlake Mecalux at MODEX 2026"
+      },
+      {
+        "offering": "Stacker Cranes (AS/RS for Pallets)",
+        "id": "aTdB_4uSmrM",
+        "label": "AS/RS Stacker Cranes for Pallets - Combined Cycles - Interlake Mecalux"
+      },
+      {
+        "offering": "AS/RS Trilateral Stacker Cranes",
+        "id": "xPSNdMs_wKE",
+        "label": "Mecalux keeps Disalfarm in action with 15 automatic stacker cranes - Interlake Mecalux"
+      }
+    ],
+    "11": [
+      {
+        "offering": "High-Performance Pick Station",
+        "id": "bK0NyvzHOwA",
+        "label": "Mecalux launches an AI-driven robotic order picking system with Siemens technology"
+      }
+    ],
+    "12": [
+      {
+        "offering": "PopPick",
+        "id": "EvGRXnXg2Q8",
+        "label": "Geek+ PopPick"
+      }
+    ],
+    "13": [
+      {
+        "offering": "AutoStore",
+        "id": "U2AGLeJBFNg",
+        "label": "Worlds most advanced robotic warehouse (AI automation)"
+      }
+    ],
+    "14": [
+      {
+        "offering": "Origin",
+        "id": "_s2eYT48da4",
+        "label": "Locus Origin"
+      },
+      {
+        "offering": "Vector",
+        "id": "Cq7iTmQple4",
+        "label": "Locus Vector FS Product Demo | Locus Robotics"
+      }
+    ],
+    "15": [
+      {
+        "offering": "Pick-to-Light",
+        "id": "sWXqLctSygg",
+        "label": "Asian Bearindo Lean Automation for Maximum Results | Daifuku"
+      }
+    ],
+    "16": [
+      {
+        "offering": "Pick-to-Light",
+        "id": "KWzctn8EjmA",
+        "label": "Pick to Light Demonstration"
+      }
+    ],
+    "17": [
+      {
+        "offering": "Mobilex",
+        "id": "pAuCgY4WqSE",
+        "label": "MN Twins cover all the bases with their Montel Mobilex mobile shelving system [Video]"
+      },
+      {
+        "offering": "Rack & Roll",
+        "id": "48j9qlLri_U",
+        "label": "Mobile Racking by Montel Almost Triples Warehouse's Storage for Zenith Aviation"
+      },
+      {
+        "offering": "SafeRak",
+        "id": "NKuDXKzm5p0",
+        "label": "SAFERAK 60 Industrial Powered Mobile Racking"
+      }
+    ],
+    "18": [
+      {
+        "offering": "Mobile Racking Systems",
+        "id": "V0EhTQ2EuP8",
+        "label": "Mobile Racking Systems - Movirack - Interlake Mecalux"
+      }
+    ],
+    "19": [
+      {
+        "offering": "Conveyor",
+        "id": "Cdz2FtSiRAk",
+        "label": "e24 Conveyor Plug and Play"
+      }
+    ],
+    "20": [
+      {
+        "offering": "Conveyor",
+        "id": "iHC9ec591lI",
+        "label": "AutoStore | Introduction: Stop Airhousing, Start Warehousing"
+      }
+    ],
+    "21": [
+      {
+        "offering": "Conveyor",
+        "id": "fNfrnOJ1acY",
+        "label": "Cartons on Lane Merge Conveyor System & Equipment"
+      }
+    ],
+    "22": [
+      {
+        "offering": "Conveyor",
+        "id": "8cHdGKzvMHU",
+        "label": "Alba Mfg - Optimizing Workflow in Secure Environments with Plug-and-Play Conveyor Solutions"
+      }
+    ],
+    "23": [
+      {
+        "offering": "Conveyor",
+        "id": "4mmhvhP6WM8",
+        "label": "Titan-Factory Automation"
+      }
+    ],
+    "24": [
+      {
+        "offering": "Conveyor",
+        "id": "S2RSHsn57Cw",
+        "label": "Russell Conveyor About 001"
+      }
+    ],
+    "25": [
+      {
+        "offering": "Flexible Conveyors",
+        "id": "KI6AKeFJSck",
+        "label": "FMH LITESORT Walk Through"
+      },
+      {
+        "offering": "Load/Unload Conveyors",
+        "id": "GGAz4gRQtu8",
+        "label": "FMH MaxxReach Telescopic Conveyors"
+      }
+    ],
+    "26": [
+      {
+        "offering": "AMR",
+        "id": "dS2Fcoc4KRg",
+        "label": "AMRs: The ultimate solution for seamless warehouse automation"
+      },
+      {
+        "offering": "AGV",
+        "id": "prsYCwm2WFs",
+        "label": "How Herba Ricemills boosted productivity by 25% with warehouse automation"
+      }
+    ],
+    "27": [
+      {
+        "offering": "AMR",
+        "id": "qahujJ-8vdk",
+        "label": "AMR vs AGV Robotic Solutions in Warehouse Automation"
+      }
+    ],
+    "28": [
+      {
+        "offering": "AMR",
+        "id": "LfVk2qFgPks",
+        "label": "Smart AMR platform KMP 1500P maximizes efficiency in production halls"
+      }
+    ],
+    "29": [
+      {
+        "offering": "AMR",
+        "id": "FlymYEZleWg",
+        "label": "What is an AMR?"
+      }
+    ],
+    "30": [
+      {
+        "offering": "Fleet Sort",
+        "id": "nBAAze817ME",
+        "label": "Geek+ Customizable Sorting Solutions"
+      },
+      {
+        "offering": "AMR",
+        "id": "PzvIswmVzIY",
+        "label": "Geek+ One-stop Partner for Warehouse Robotics"
+      },
+      {
+        "offering": "AGV",
+        "id": "kFLvf6_7HgA",
+        "label": "Geek+ and FDL implement smart sorting solution for e-commerce"
+      }
+    ],
+    "31": [
+      {
+        "offering": "AMR",
+        "id": "Hg7cF3NaYVU",
+        "label": "Movu ifollow - the fast, flexible way to automate your warehouse"
+      }
+    ],
+    "32": [
+      {
+        "offering": "AGV",
+        "id": "mBjV_KvDwlA",
+        "label": "AGILOX Success Story with Geberit"
+      }
+    ],
+    "33": [
+      {
+        "offering": "Material Lifts",
+        "id": "uNOBxwUEN5Y",
+        "label": "Time Lapse Video of Vertical Lift Installation"
+      }
+    ],
+    "34": [
+      {
+        "offering": "Material Lifts",
+        "id": "2lgvtRuxKm4",
+        "label": "[World's First] Ergonomic spring balance Auto Leveling Order Picker Lift \"MAX PRIME\""
+      }
+    ],
+    "35": [
+      {
+        "offering": "AMR",
+        "id": "Mu59HEDtNuY",
+        "label": "Toyota Autopilot CDI120"
+      },
+      {
+        "offering": "AGV",
+        "id": "c7RIVbmmnFY",
+        "label": "Toyota AGV at TORO"
+      }
+    ],
+    "36": [
+      {
+        "offering": "Carton Erecting",
+        "id": "HWOOgqVEgCM",
+        "label": "Sawyer Robotic Box Erector"
+      },
+      {
+        "offering": "Bagging",
+        "id": "r71r0RjBzTM",
+        "label": "Apparel Autobagger 2019"
+      },
+      {
+        "offering": "Sealing",
+        "id": "Wjgu9oJJkaI",
+        "label": "Accutech Automated Returns Wrapping Solution"
+      },
+      {
+        "offering": "Label Application/Printing",
+        "id": "cYUZZJ7hL1c",
+        "label": "PACjacket Scanning and Label Application"
+      },
+      {
+        "offering": "Stretch Wrapping",
+        "id": "F70zDJNq0Tc",
+        "label": "Accutech at ProMat 2023 03 20 2023 1"
+      }
+    ],
+    "37": [
+      {
+        "offering": "Carton Erecting",
+        "id": "Pr3ug6rvpjQ",
+        "label": "Flex-Line Automation | Branding Video 2021"
+      },
+      {
+        "offering": "Adjustable Guardrail",
+        "id": "mfsnI7-2v0Y",
+        "label": "Automated Packaging Solutions for E-Commerce"
+      }
+    ],
+    "38": [
+      {
+        "offering": "Wrapping",
+        "id": "gUQYsIoZjF8",
+        "label": "Conveyorized stretch wrapper with robotic corner board applicators and pallet stacker"
+      }
+    ],
+    "39": [
+      {
+        "offering": "Wrapping",
+        "id": "sb7cDaSslhc",
+        "label": "From Dock to Production: Veritivs Custom Packaging & Logistics Solution"
+      }
+    ],
+    "40": [
+      {
+        "offering": "Wrapping",
+        "id": "hoW_u1FmlIk",
+        "label": "Storfast Warehouse Automation Solutions - Demo"
+      },
+      {
+        "offering": "Strapping",
+        "id": "Elg9DSyYo_I",
+        "label": "Signode MH VM Automated Strapping System"
+      }
+    ],
+    "41": [
+      {
+        "offering": "Barcode Scanning",
+        "id": "Gzp3v2UJcFw",
+        "label": "Turret Scanner Highlight | Diamond Technologies"
+      },
+      {
+        "offering": "Weigh-in-Motion",
+        "id": "Zf8e0Bi9ZrI",
+        "label": "RFID Spacecode Drawer for total management of diamond inventory"
+      },
+      {
+        "offering": "Label Application/Printing",
+        "id": "Bum7xL9EcuU",
+        "label": "Jungheinrich implements flexible and scalable automation solution for Geostick"
+      }
+    ],
+    "42": [
+      {
+        "offering": "Barcode Scanning",
+        "id": "-iygvfAGy10",
+        "label": "Warehouse Management & Order Fulfillment with The Numina Group"
+      }
+    ],
+    "43": [
+      {
+        "offering": "Barcode Scanning",
+        "id": "hligtloNyt8",
+        "label": "Increasing Efficiency: Hungry Howie's Testimonial | KEYENCE BT Series"
+      }
+    ],
+    "44": [
+      {
+        "offering": "Fixed Weighing",
+        "id": "ZvdRv6tNlBA",
+        "label": "WMF High Precision Weigh Modules - de"
+      },
+      {
+        "offering": "Weigh-in-Motion",
+        "id": "WFSflq7q5k8",
+        "label": "Understanding TruckPass - Product Demonstration - METTLER TOLEDO Industrial - en"
+      }
+    ],
+    "45": [
+      {
+        "offering": "Area Sensors",
+        "id": "XJ-MxqnWoMY",
+        "label": "Introduction To AI Industrial Machine Vision Sensor | Keyence IV4"
+      },
+      {
+        "offering": "Light Curtains",
+        "id": "wFxcda3tRUk",
+        "label": "Safety Light Curtains - First Time Setup Guide | KEYENCE GL-R Series"
+      },
+      {
+        "offering": "Interlocks",
+        "id": "RUibt0ekomk",
+        "label": "Hybrid Safety Interlock | KEYENCE GS-M"
+      }
+    ],
+    "46": [
+      {
+        "offering": "Guarding",
+        "id": "fBGK4A6IfY4",
+        "label": "How Automation & Material Handling Teams Are Working Together | Mondays With Milt"
+      },
+      {
+        "offering": "Enclosures",
+        "id": "TfD2nGZd_PU",
+        "label": "WireCrafters Secure Pallet Rack Enclosures"
+      }
+    ],
+    "47": [
+      {
+        "offering": "Machine Vision",
+        "id": "4p3WmTdRddU",
+        "label": "How does ecommerce order processing work? Order Fulfillment with Cognex Machine Vision for Logistics"
+      }
+    ],
+    "48": [
+      {
+        "offering": "Machine Vision",
+        "id": "o5u5yYRajLg",
+        "label": "Keyence Vision Off-Set Tutorial"
+      }
+    ],
+    "49": [
+      {
+        "offering": "Industrial Robots",
+        "id": "u2BfVmmaWvk",
+        "label": "Where automation meets automotive, there's FANUC!"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "QwmmuBCM0Ls",
+        "label": "Revolutionizing Warehouse Automation with OSARO"
+      }
+    ],
+    "50": [
+      {
+        "offering": "Industrial Robots",
+        "id": "mzQbLbIVSX0",
+        "label": "ABB Robots at Jacobi Robotics handling mixed-case palletizing"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "d_5LR1VAUss",
+        "label": "Boosting logistics process at ABBs instrumentation factory in Italy with robotic automation"
+      }
+    ],
+    "51": [
+      {
+        "offering": "Industrial Robots",
+        "id": "3K8nwgZZv_g",
+        "label": "Automation in the food industry: from delivery to distribution - worldwide"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "bpgHooPqbSk",
+        "label": "End-to-End Automation Unleashed: From Pallet to Warehouse, Fully Unmanned!"
+      }
+    ],
+    "52": [
+      {
+        "offering": "Collaborative Robots",
+        "id": "YJwPTLuAnOk",
+        "label": "The Impact of AI-Powered Collaborative Robots on Efficiency and Innovation"
+      }
+    ],
+    "53": [
+      {
+        "offering": "AI Picking",
+        "id": "N9p6eJ1mhqk",
+        "label": "Mecalux launches an AI-driven robotic order picking system with Siemens technology"
+      }
+    ],
+    "54": [
+      {
+        "offering": "Industrial Robots",
+        "id": "9Agh-S6FokU",
+        "label": "Fully Automated production cell | FANUC at EMO 2023"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "kdKVN296gsU",
+        "label": "Random Mixed Depalletization with 3D Vision, Courtesy of JR Automation and Plus One Robotics"
+      }
+    ],
+    "55": [
+      {
+        "offering": "Industrial Robots",
+        "id": "Kllyw9N7nS0",
+        "label": "ABBs Packaging & Logistics HQ in Altanta, GA, US"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "O3al52UWoc0",
+        "label": "Automated Modular Construction - ABB Robots build wall panels - The House of Design & AutoVol"
+      }
+    ],
+    "56": [
+      {
+        "offering": "Industrial Robots",
+        "id": "qiX7xSWud9g",
+        "label": "Automated Trailer Unloading with KUKA Improves Warehouse Efficiency"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "AZUGbXOR9s0",
+        "label": "Next level of (intra-)logistics: The autonomous mobile cobot KMR iisy"
+      }
+    ],
+    "57": [
+      {
+        "offering": "Collaborative Robots",
+        "id": "-CESiuu7CYs",
+        "label": "Robotic Case Erector and Case Packer | Universal Robots | Cobots | ONExia Inc."
+      }
+    ],
+    "58": [
+      {
+        "offering": "Industrial Robots",
+        "id": "xvZ2nGJP1PA",
+        "label": "Palletising up to 1000 bags per hour with a FANUC robot M-710iC/70"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "gQMlOFOohjM",
+        "label": "Industrial Robots vs. Collaborative Robots | A Clear Winner?"
+      }
+    ],
+    "59": [
+      {
+        "offering": "Industrial Robots",
+        "id": "Fa4r_tkbXfg",
+        "label": "ABB Robots help Austrian students to build the skills for an automated future"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "jtU-n7CZt5U",
+        "label": "Technipes WINTECH-ABB Robotic Palletizer"
+      }
+    ],
+    "60": [
+      {
+        "offering": "Industrial Robots",
+        "id": "DUrKvPSOL8U",
+        "label": "Feel the flow of automation: Autonomous mobile robotics by KUKA"
+      },
+      {
+        "offering": "Collaborative Robots",
+        "id": "6aUeYyG8jag",
+        "label": "KUKA & Swisslog @ CeMAT Australia 2018"
+      }
+    ],
+    "61": [
+      {
+        "offering": "Collaborative Robots",
+        "id": "EstUXL9V-0k",
+        "label": "Collaborative robots from Universal Robots enables flexible automation at DCL Logistics"
+      }
+    ],
+    "62": [
+      {
+        "offering": "Collaborative Robots",
+        "id": "28RO7K-Gxaw",
+        "label": "Multi Deep Shuttle ASRS with Robotic Palletizer/ De palletizer"
+      }
+    ]
   };
 
   function el(id) {
@@ -1838,16 +2540,48 @@ button.is-active {
     return (first + second).toUpperCase();
   }
 
+  function youtubeEmbedUrl(videoId) {
+    return 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(text(videoId)) + '?rel=0';
+  }
+
   function renderVideo(r) {
     if (!state.showVideos) return '';
-    var video = videoCatalog[text(r.subcategory)] || videoCatalog[text(r.category)];
-    if (!video || !video.id) return '';
-    var title = video.label + ' for ' + text(r.subcategory || r.category);
+    var videos = videoCatalog[text(r.id)] || [];
+    if (!videos.length) return '';
+    var video = videos[0];
+    var hasMultiple = videos.length > 1;
+    var dots = '';
+    for (var i = 0; i < videos.length; i++) {
+      dots += '<button class="video-dot' + (i === 0 ? ' is-active' : '') + '" type="button" data-video-index="' + i + '" aria-label="Show video ' + (i + 1) + ' of ' + videos.length + '"></button>';
+    }
+    var title = text(video.label) + ' for ' + text(video.offering);
     return ''
-      + '<div class="video-panel"' + tipAttr('Embedded YouTube overview for this technology area. Use it as a quick refresher, then validate vendor-specific fit with the contact.') + '>'
-      +   '<div class="video-title"><span>' + esc(video.label) + '</span><span>' + esc(r.subcategory) + '</span></div>'
-      +   '<iframe class="video-frame" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="' + esc(title) + '" src="https://www.youtube-nocookie.com/embed/' + esc(video.id) + '?rel=0"></iframe>'
+      + '<div class="video-panel" data-record-id="' + esc(r.id) + '" data-video-current="0"' + tipAttr('Embedded YouTube video for this specific offering. Use the arrows or dots to switch offerings on cards with more than one video.') + '>'
+      +   '<div class="video-title"><span class="video-label">' + esc(video.label) + '</span><span class="video-offering">' + esc(video.offering) + '</span></div>'
+      +   '<iframe class="video-frame" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="' + esc(title) + '" src="' + esc(youtubeEmbedUrl(video.id)) + '"></iframe>'
+      +   '<div class="video-controls">'
+      +     '<button class="video-step" type="button" data-video-action="prev" ' + (hasMultiple ? '' : 'disabled ') + 'aria-label="Previous offering video">&lsaquo;</button>'
+      +     '<div class="video-dots">' + dots + '</div>'
+      +     '<button class="video-step" type="button" data-video-action="next" ' + (hasMultiple ? '' : 'disabled ') + 'aria-label="Next offering video">&rsaquo;</button>'
+      +   '</div>'
       + '</div>';
+  }
+
+  function updateVideoPanel(panel, nextIndex) {
+    var videos = videoCatalog[text(panel.getAttribute('data-record-id'))] || [];
+    if (!videos.length) return;
+    var index = ((nextIndex % videos.length) + videos.length) % videos.length;
+    var video = videos[index];
+    panel.setAttribute('data-video-current', String(index));
+    panel.querySelector('.video-label').textContent = text(video.label);
+    panel.querySelector('.video-offering').textContent = text(video.offering);
+    var frame = panel.querySelector('.video-frame');
+    frame.src = youtubeEmbedUrl(video.id);
+    frame.title = text(video.label) + ' for ' + text(video.offering);
+    var dots = panel.querySelectorAll('.video-dot');
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].className = 'video-dot' + (i === index ? ' is-active' : '');
+    }
   }
 
   function renderCard(r) {
@@ -1900,7 +2634,7 @@ button.is-active {
       el('contact').value = '';
       el('offering').value = '';
       el('sortBy').value = 'vendor';
-      state.showVideos = false;
+      state.showVideos = true;
       state.compact = false;
       render();
     });
@@ -1918,6 +2652,18 @@ button.is-active {
       if (!button) return;
       el('category').value = button.getAttribute('data-category') || '';
       render();
+    });
+    el('cards').addEventListener('click', function (event) {
+      var panel = event.target.closest('.video-panel');
+      if (!panel) return;
+      var current = parseInt(panel.getAttribute('data-video-current') || '0', 10) || 0;
+      var actionButton = event.target.closest('button[data-video-action]');
+      var dotButton = event.target.closest('button[data-video-index]');
+      if (actionButton) {
+        updateVideoPanel(panel, current + (actionButton.getAttribute('data-video-action') === 'next' ? 1 : -1));
+      } else if (dotButton) {
+        updateVideoPanel(panel, parseInt(dotButton.getAttribute('data-video-index') || '0', 10) || 0);
+      }
     });
   }
 
