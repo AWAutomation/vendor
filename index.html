@@ -10,6 +10,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no,email=no,address=no">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -228,6 +229,274 @@ button:hover {
   .card { padding: 16px; }
 }
 </style>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #070b10;
+  --bg-2: #0c121a;
+  --surface: rgba(17, 24, 34, 0.86);
+  --surface-solid: #121a25;
+  --surface-2: #182231;
+  --text: #edf4f8;
+  --muted: #98a8b8;
+  --line: rgba(148, 163, 184, 0.22);
+  --line-strong: rgba(148, 163, 184, 0.36);
+  --brand: #42d392;
+  --brand-2: #74c0fc;
+  --brand-soft: rgba(66, 211, 146, 0.16);
+  --danger: #ff7a90;
+  --shadow: 0 18px 70px rgba(0, 0, 0, 0.42);
+  --radius: 18px;
+  --radius-sm: 10px;
+}
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(66, 211, 146, 0.14), transparent 32rem),
+    radial-gradient(circle at 82% 8%, rgba(116, 192, 252, 0.16), transparent 36rem),
+    linear-gradient(135deg, var(--bg), var(--bg-2) 46%, #080b0f);
+  color: var(--text);
+  padding: 18px;
+}
+a { color: inherit; }
+.wrap { max-width: 1840px; }
+.panel {
+  background: linear-gradient(180deg, rgba(18, 26, 37, 0.92), rgba(12, 18, 26, 0.92));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.hero {
+  padding: 24px;
+  border-radius: 20px;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(66, 211, 146, 0.12), transparent 38%, rgba(116, 192, 252, 0.10));
+}
+.hero > * { position: relative; z-index: 1; }
+h1 {
+  font-size: clamp(30px, 4vw, 54px);
+  letter-spacing: 0;
+}
+.subhead { color: var(--muted); }
+.grid {
+  grid-template-columns: minmax(260px, 1.25fr) repeat(7, minmax(150px, 1fr));
+  gap: 10px;
+}
+input, select {
+  min-height: 44px;
+  border-color: var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(8, 13, 19, 0.76);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 19px,
+    calc(100% - 12px) 19px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+input::placeholder { color: #708092; }
+input:focus, select:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(66, 211, 146, 0.14);
+}
+.actions {
+  align-items: center;
+  justify-content: space-between;
+}
+.action-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+button {
+  border-color: var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(18, 26, 37, 0.94);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+button:hover {
+  border-color: var(--brand);
+  background: rgba(66, 211, 146, 0.14);
+}
+button.is-active {
+  border-color: rgba(66, 211, 146, 0.65);
+  background: linear-gradient(180deg, rgba(66, 211, 146, 0.26), rgba(66, 211, 146, 0.12));
+}
+.stat {
+  border-color: var(--line);
+  background: rgba(66, 211, 146, 0.10);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+}
+.stat strong,
+.stat span { color: var(--brand); }
+.cards {
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  align-items: start;
+}
+.cards.compact {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.card {
+  padding: 18px;
+  overflow: visible;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.card:hover {
+  border-color: rgba(66, 211, 146, 0.48);
+  transform: translateY(-2px);
+}
+.card h3 {
+  font-size: 22px;
+  letter-spacing: 0;
+}
+.vendor-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(66, 211, 146, 0.24), rgba(116, 192, 252, 0.18));
+  color: var(--brand);
+  font-weight: 800;
+}
+.vendor-meta {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.label {
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.chip, .chip-link {
+  border-color: var(--line);
+  background: rgba(148, 163, 184, 0.10);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+}
+.chip-link:hover {
+  border-color: var(--brand);
+  background: rgba(66, 211, 146, 0.14);
+}
+.chip.offering {
+  color: #dfffee;
+  background: rgba(66, 211, 146, 0.14);
+}
+.chip.phone, .chip.email, .chip.website,
+.chip-link.phone, .chip-link.email, .chip-link.website {
+  color: #d9efff;
+  background: rgba(116, 192, 252, 0.13);
+}
+.empty-chip {
+  background: rgba(148, 163, 184, 0.08) !important;
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+}
+.notes {
+  color: #d4dee8;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.video-panel {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #05080c;
+}
+.video-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.video-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  display: block;
+}
+.quick-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.quick-filter {
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.empty {
+  color: var(--muted);
+}
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  z-index: 20;
+  width: min(320px, 80vw);
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.30);
+  border-radius: var(--radius-sm);
+  background: rgba(6, 10, 15, 0.96);
+  color: var(--text);
+  box-shadow: 0 16px 44px rgba(0,0,0,0.45);
+  font-size: 12px;
+  line-height: 1.35;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (max-width: 1400px) {
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  body { padding: 12px; }
+  .hero { padding: 18px; }
+  .grid { grid-template-columns: 1fr; }
+  .cards, .cards.compact { grid-template-columns: 1fr; }
+  .actions { align-items: stretch; }
+  .action-group { width: 100%; }
+  button { flex: 1 1 auto; }
+}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -235,19 +504,33 @@ button:hover {
     <h1>Vendor Directory</h1>
     <p class="subhead">Search and filter across vendors, offerings, contacts, phone numbers, websites, and notes.</p>
     <div class="grid">
-      <input id="search" type="text" placeholder="Search all fields">
-      <select id="category"></select>
-      <select id="subcategory"></select>
-      <select id="vendor"></select>
-      <select id="contact"></select>
-      <select id="offering"></select>
+      <input id="search" type="text" placeholder="Search all fields" data-tip="Search vendors, technologies, contacts, websites, phone numbers, notes, and offerings at the same time.">
+      <select id="category" data-tip="Filter by the broad technology family, such as storage, material movement, support technologies, or robotics."></select>
+      <select id="subcategory" data-tip="Filter by the more specific application area inside a category."></select>
+      <select id="vendor" data-tip="Filter to one vendor or manufacturer."></select>
+      <select id="contact" data-tip="Filter to records associated with a specific vendor contact."></select>
+      <select id="offering" data-tip="Filter by a specific product, platform, or capability."></select>
+      <select id="sortBy" data-tip="Change the order of the visible vendor cards.">
+        <option value="vendor">Sort by vendor</option>
+        <option value="category">Sort by category</option>
+        <option value="subcategory">Sort by subcategory</option>
+        <option value="contact">Sort by contact</option>
+      </select>
     </div>
     <div class="actions">
-      <button id="clearBtn" type="button">Clear filters</button>
+      <div class="action-group">
+        <button id="clearBtn" type="button" data-tip="Reset search, filters, sort, and view options.">Clear filters</button>
+        <button id="videoBtn" type="button" data-tip="Show or hide embedded YouTube videos for the matching technology area.">Show videos</button>
+        <button id="compactBtn" type="button" data-tip="Switch between roomy cards and a denser scanning layout.">Compact view</button>
+        <button id="exportBtn" type="button" data-tip="Download the currently visible records as a CSV file.">Export visible CSV</button>
+      </div>
     </div>
+    <div id="quickFilters" class="quick-filters" aria-label="Quick category filters"></div>
     <div class="stats">
       <div class="stat"><span id="visibleCount">0</span> visible</div>
       <div class="stat"><span id="totalCount">0</span> total</div>
+      <div class="stat"><span id="categoryCount">0</span> categories</div>
+      <div class="stat"><span id="vendorCount">0</span> vendors</div>
     </div>
   </div>
 
@@ -1257,6 +1540,51 @@ button:hover {
 (function () {
   var raw = document.getElementById('records-data').textContent || '[]';
   var records = JSON.parse(raw);
+  var state = {
+    showVideos: false,
+    compact: false
+  };
+
+  var categoryDescriptions = {
+    'Storage & Retrieval': 'Systems that store inventory densely and retrieve it with less walking, handling, and floor-space waste.',
+    'Material Movement': 'Equipment that moves totes, cases, pallets, or products through a facility with conveyors, lifts, AMRs, AGVs, or packaging flow.',
+    'Support Technologies': 'Enabling systems for identification, inspection, weighing, machine safety, and traceability around automation.',
+    'Robotics': 'Industrial and collaborative robot applications for picking, packing, palletizing, and other repeatable handling tasks.'
+  };
+
+  var subcategoryDescriptions = {
+    'Dense Piece Storage': 'Automated storage for individual parts or small items, often using vertical lift modules or carousels to bring inventory to an operator.',
+    'Dense Tote/Case Storage': 'High-density automated storage and retrieval for totes or cases, usually feeding goods-to-person picking or downstream automation.',
+    'Dense Pallet Storage': 'Pallet shuttle, crane, or cube-style systems that store pallet loads compactly and reduce forklift travel.',
+    'Goods-to-Person': 'Automation that brings inventory to a workstation so operators pick with less travel and better ergonomics.',
+    'Mobile Racking Systems': 'Racks or shelving on movable bases that open aisles only when needed, increasing storage density.',
+    'Fixed Conveyance': 'Installed conveyor systems that move product, totes, cartons, or pallets along defined paths.',
+    'Mobile Conveyance': 'AMRs and AGVs that move materials without fixed conveyor, supporting flexible transport routes.',
+    'Packaging': 'Equipment for erecting, sealing, wrapping, bagging, strapping, and preparing products or pallets for shipment.',
+    'Identification': 'Barcode, label, print-and-apply, RFID, and weighing technologies that identify, track, and verify material flow.',
+    'Safety': 'Devices and guarding that help protect people around machinery, conveyors, robots, and automated cells.',
+    'Vision': 'Camera-based systems that inspect, identify, measure, guide, or verify products automatically.',
+    'Robotic Picking': 'Robots that identify, grip, and pick items or cases to reduce repetitive manual picking work.',
+    'Robotic Packing': 'Robots that place products into cartons, trays, bags, or other packaging formats.',
+    'Robotic Palletizing': 'Robots that stack cases, bags, totes, or products onto pallets with consistent patterns and less manual lifting.'
+  };
+
+  var videoCatalog = {
+    'Dense Piece Storage': { id: 'TSTs6pK70C8', label: 'Vertical lift module overview' },
+    'Dense Tote/Case Storage': { id: 'zbtG5TTxy0c', label: 'Automated tote/case shuttle overview' },
+    'Dense Pallet Storage': { id: 'UlXZYY53jv8', label: 'Pallet shuttle system overview' },
+    'Goods-to-Person': { id: 'iHC9ec591lI', label: 'Goods-to-person automation overview' },
+    'Mobile Racking Systems': { id: 'V0EhTQ2EuP8', label: 'Mobile racking system overview' },
+    'Fixed Conveyance': { id: 'vuZEBjaR4b4', label: 'Warehouse conveyor overview' },
+    'Mobile Conveyance': { id: 'qahujJ-8vdk', label: 'AMR and AGV comparison' },
+    'Packaging': { id: 'lrE6FKRJ7Ys', label: 'Packaging automation overview' },
+    'Identification': { id: 'cblm3kxAmsE', label: 'Warehouse identification overview' },
+    'Safety': { id: 'bXfuZ2jcds4', label: 'Machine guarding and interlock overview' },
+    'Vision': { id: '0Snnn6hp6yQ', label: 'Machine vision overview' },
+    'Robotic Picking': { id: 'UtBa9yVZBJM', label: 'Robotic picking overview' },
+    'Robotic Packing': { id: '8Gp7i2WkpEw', label: 'Robotic packing overview' },
+    'Robotic Palletizing': { id: 'xvZ2nGJP1PA', label: 'Robotic palletizing overview' }
+  };
 
   function el(id) {
     return document.getElementById(id);
@@ -1279,6 +1607,11 @@ button:hover {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function tipAttr(value) {
+    var v = text(value).trim();
+    return v ? ' data-tip="' + esc(v) + '"' : '';
   }
 
   function uniq(values) {
@@ -1343,7 +1676,7 @@ button:hover {
   }
 
   function offeringsText(r) {
-    return toArray(r.offerings).join(' • ');
+    return toArray(r.offerings).join(' | ');
   }
 
   function searchBlob(r) {
@@ -1381,13 +1714,19 @@ button:hover {
   }
 
   function populateFilters() {
-    setOptions(el('category'), 'All categories', collectValues('category'));
+    var categories = collectValues('category');
+    setOptions(el('category'), 'All categories', categories);
     setOptions(el('subcategory'), 'All subcategories', collectValues('subcategory'));
     setOptions(el('vendor'), 'All vendors', collectValues('vendor'));
     setOptions(el('contact'), 'All contacts', collectValues('contact'));
     var offeringValues = [];
     for (var i = 0; i < records.length; i++) offeringValues = offeringValues.concat(toArray(records[i].offerings));
     setOptions(el('offering'), 'All offerings', uniq(offeringValues));
+    var quickHtml = '<button class="quick-filter is-active" type="button" data-category=""' + tipAttr('Show every category in the directory.') + '>All</button>';
+    for (var c = 0; c < categories.length; c++) {
+      quickHtml += '<button class="quick-filter" type="button" data-category="' + esc(categories[c]) + '"' + tipAttr(categoryDescriptions[categories[c]]) + '>' + esc(categories[c]) + '</button>';
+    }
+    el('quickFilters').innerHTML = quickHtml;
   }
 
   function hasMatch(field, selected) {
@@ -1399,56 +1738,65 @@ button:hover {
     return false;
   }
 
-  function chip(textValue, className) {
-    return '<span class="chip ' + (className || '') + '">' + esc(textValue) + '</span>';
+  function describeChip(textValue, context, record) {
+    var value = text(textValue);
+    if (context === 'category') return categoryDescriptions[value] || 'Technology category used to group related vendors and capabilities.';
+    if (context === 'subcategory') return subcategoryDescriptions[value] || 'Specific application area within the broader technology category.';
+    if (context === 'offering') return value + ' from ' + text(record && record.vendor) + ': ' + text(record && record.notes);
+    if (context === 'contact') return 'Vendor contact for ' + text(record && record.vendor) + '.';
+    return '';
   }
 
-  function linkChip(textValue, href, className) {
-    return '<a class="chip-link ' + (className || '') + '" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(textValue) + '</a>';
+  function chip(textValue, className, tooltip) {
+    return '<span class="chip ' + (className || '') + '"' + tipAttr(tooltip) + '>' + esc(textValue) + '</span>';
   }
 
-  function renderChipGroup(values, className, emptyLabel) {
+  function linkChip(textValue, href, className, tooltip) {
+    return '<a class="chip-link ' + (className || '') + '" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer"' + tipAttr(tooltip) + '>' + esc(textValue) + '</a>';
+  }
+
+  function renderChipGroup(values, className, emptyLabel, context, record) {
     var arr = toArray(values);
-    if (!arr.length) return '<div class="chips"><span class="chip empty-chip">' + esc(emptyLabel || '—') + '</span></div>';
+    if (!arr.length) return '<div class="chips"><span class="chip empty-chip">' + esc(emptyLabel || '-') + '</span></div>';
     var out = '<div class="chips">';
-    for (var i = 0; i < arr.length; i++) out += chip(arr[i], className);
+    for (var i = 0; i < arr.length; i++) out += chip(arr[i], className, describeChip(arr[i], context, record));
     return out + '</div>';
   }
 
   function renderPhoneChips(values, emptyLabel) {
     var arr = toArray(values);
-    if (!arr.length) return '<div class="chips"><span class="chip empty-chip">' + esc(emptyLabel || '—') + '</span></div>';
+    if (!arr.length) return '<div class="chips"><span class="chip empty-chip">' + esc(emptyLabel || '-') + '</span></div>';
     var out = '<div class="chips">';
     for (var i = 0; i < arr.length; i++) {
       var v = text(arr[i]).trim();
-      if (!v || v === 'XXX-XXX-XXXX') out += '<span class="chip empty-chip">—</span>';
-      else out += '<a class="chip-link phone" href="' + esc(telHref(v)) + '">' + esc(v) + '</a>';
+      if (!v || v === 'XXX-XXX-XXXX') out += '<span class="chip empty-chip">-</span>';
+      else out += '<a class="chip-link phone" href="' + esc(telHref(v)) + '"' + tipAttr('Call ' + v + '.') + '>' + esc(v) + '</a>';
     }
     return out + '</div>';
   }
 
   function renderEmailChips(values, emptyLabel) {
     var arr = toArray(values);
-    if (!arr.length) return '<div class="chips"><span class="chip empty-chip">' + esc(emptyLabel || '—') + '</span></div>';
+    if (!arr.length) return '<div class="chips"><span class="chip empty-chip">' + esc(emptyLabel || '-') + '</span></div>';
     var out = '<div class="chips">';
     for (var i = 0; i < arr.length; i++) {
       var v = text(arr[i]).trim();
-      if (!v) out += '<span class="chip empty-chip">—</span>';
-      else out += '<a class="chip-link email" href="mailto:' + esc(v) + '">' + esc(v) + '</a>';
+      if (!v) out += '<span class="chip empty-chip">-</span>';
+      else out += '<a class="chip-link email" href="mailto:' + esc(v) + '"' + tipAttr('Start an email to ' + v + '.') + '>' + esc(v) + '</a>';
     }
     return out + '</div>';
   }
 
   function renderWebsiteChip(value) {
     var url = text(value).trim();
-    if (!url) return '<div class="chips"><span class="chip empty-chip">—</span></div>';
-    return '<div class="chips">' + linkChip(compactLabelFromUrl(url), url, 'website') + '</div>';
+    if (!url) return '<div class="chips"><span class="chip empty-chip">-</span></div>';
+    return '<div class="chips">' + linkChip(compactLabelFromUrl(url), url, 'website', 'Open the vendor website in a new tab.') + '</div>';
   }
 
   function renderNotesChip(value) {
     var v = text(value).trim();
-    if (!v) return '<div class="chips"><span class="chip empty-chip">—</span></div>';
-    return '<div class="chips">' + chip(v, '') + '</div>';
+    if (!v) return '<div class="chips"><span class="chip empty-chip">-</span></div>';
+    return '<div class="notes"' + tipAttr(v) + '>' + esc(v) + '</div>';
   }
 
   function filterRecords() {
@@ -1470,37 +1818,77 @@ button:hover {
     });
   }
 
+  function sortRecords(list) {
+    var field = text(el('sortBy').value) || 'vendor';
+    return list.slice().sort(function(a, b) {
+      var av = flattenField(a[field] || a.vendor);
+      var bv = flattenField(b[field] || b.vendor);
+      if (field !== 'vendor') {
+        av += ' | ' + a.vendor;
+        bv += ' | ' + b.vendor;
+      }
+      return av.localeCompare(bv);
+    });
+  }
+
+  function initials(value) {
+    var parts = text(value).trim().split(/\s+/);
+    var first = parts[0] ? parts[0].charAt(0) : 'V';
+    var second = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+    return (first + second).toUpperCase();
+  }
+
+  function renderVideo(r) {
+    if (!state.showVideos) return '';
+    var video = videoCatalog[text(r.subcategory)] || videoCatalog[text(r.category)];
+    if (!video || !video.id) return '';
+    var title = video.label + ' for ' + text(r.subcategory || r.category);
+    return ''
+      + '<div class="video-panel"' + tipAttr('Embedded YouTube overview for this technology area. Use it as a quick refresher, then validate vendor-specific fit with the contact.') + '>'
+      +   '<div class="video-title"><span>' + esc(video.label) + '</span><span>' + esc(r.subcategory) + '</span></div>'
+      +   '<iframe class="video-frame" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="' + esc(title) + '" src="https://www.youtube-nocookie.com/embed/' + esc(video.id) + '?rel=0"></iframe>'
+      + '</div>';
+  }
+
   function renderCard(r) {
     return ''
       + '<article class="panel card">'
       +   '<div class="card-head">'
-      +     '<div><h3>' + esc(r.vendor) + '</h3></div>'
-      +     '<div class="vendor-mark" aria-hidden="true"></div>'
+      +     '<div><h3' + tipAttr(text(r.vendor) + ' provides ' + offeringsText(r) + ' for ' + text(r.subcategory) + '. ' + text(r.notes)) + '>' + esc(r.vendor) + '</h3><div class="vendor-meta">' + esc(r.category) + ' / ' + esc(r.subcategory) + '</div></div>'
+      +     '<div class="vendor-mark" aria-hidden="true">' + esc(initials(r.vendor)) + '</div>'
       +   '</div>'
-      +   '<div class="row"><div class="label">Category</div>' + renderChipGroup(r.category, '') + '</div>'
-      +   '<div class="row"><div class="label">Subcategory</div>' + renderChipGroup(r.subcategory, '') + '</div>'
-      +   '<div class="row"><div class="label">Offerings</div>' + renderChipGroup(r.offerings, 'offering') + '</div>'
-      +   '<div class="row"><div class="label">Contact</div>' + renderChipGroup(r.contact, '') + '</div>'
+      +   '<div class="row"><div class="label">Category</div>' + renderChipGroup(r.category, '', '', 'category', r) + '</div>'
+      +   '<div class="row"><div class="label">Subcategory</div>' + renderChipGroup(r.subcategory, '', '', 'subcategory', r) + '</div>'
+      +   '<div class="row"><div class="label">Offerings</div>' + renderChipGroup(r.offerings, 'offering', '', 'offering', r) + '</div>'
+      +   '<div class="row"><div class="label">Contact</div>' + renderChipGroup(r.contact, '', '', 'contact', r) + '</div>'
       +   '<div class="row"><div class="label">Phone</div>' + renderPhoneChips(r.phone) + '</div>'
       +   '<div class="row"><div class="label">Mobile</div>' + renderPhoneChips(r.mobile) + '</div>'
       +   '<div class="row"><div class="label">Email</div>' + renderEmailChips(r.email) + '</div>'
       +   '<div class="row"><div class="label">Website</div>' + renderWebsiteChip(r.website) + '</div>'
       +   '<div class="row"><div class="label">Notes</div>' + renderNotesChip(r.notes) + '</div>'
+      +   renderVideo(r)
       + '</article>';
   }
 
   function render() {
-    var filtered = filterRecords();
+    var filtered = sortRecords(filterRecords());
     var cardsHtml = '';
     for (var i = 0; i < filtered.length; i++) cardsHtml += renderCard(filtered[i]);
     el('cards').innerHTML = cardsHtml;
+    el('cards').className = 'cards' + (state.compact ? ' compact' : '');
     el('visibleCount').textContent = String(filtered.length);
     el('totalCount').textContent = String(records.length);
+    el('categoryCount').textContent = String(uniq(filtered.map(function(r) { return r.category; })).length);
+    el('vendorCount').textContent = String(uniq(filtered.map(function(r) { return r.vendor; })).length);
     el('empty').style.display = filtered.length ? 'none' : 'block';
+    updateQuickFilters();
+    el('videoBtn').className = state.showVideos ? 'is-active' : '';
+    el('videoBtn').textContent = state.showVideos ? 'Hide videos' : 'Show videos';
+    el('compactBtn').className = state.compact ? 'is-active' : '';
   }
 
   function bind() {
-    var ids = ['search', 'category', 'subcategory', 'vendor', 'contact', 'offering'];
+    var ids = ['search', 'category', 'subcategory', 'vendor', 'contact', 'offering', 'sortBy'];
     for (var i = 0; i < ids.length; i++) {
       el(ids[i]).addEventListener(ids[i] === 'search' ? 'input' : 'change', render);
     }
@@ -1511,8 +1899,69 @@ button:hover {
       el('vendor').value = '';
       el('contact').value = '';
       el('offering').value = '';
+      el('sortBy').value = 'vendor';
+      state.showVideos = false;
+      state.compact = false;
       render();
     });
+    el('videoBtn').addEventListener('click', function () {
+      state.showVideos = !state.showVideos;
+      render();
+    });
+    el('compactBtn').addEventListener('click', function () {
+      state.compact = !state.compact;
+      render();
+    });
+    el('exportBtn').addEventListener('click', exportVisibleCsv);
+    el('quickFilters').addEventListener('click', function (event) {
+      var button = event.target.closest('button[data-category]');
+      if (!button) return;
+      el('category').value = button.getAttribute('data-category') || '';
+      render();
+    });
+  }
+
+  function updateQuickFilters() {
+    var selected = text(el('category').value);
+    var buttons = el('quickFilters').querySelectorAll('button[data-category]');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].className = 'quick-filter' + (buttons[i].getAttribute('data-category') === selected ? ' is-active' : '');
+    }
+  }
+
+  function csvCell(value) {
+    var v = text(value).replace(/\r?\n/g, ' ');
+    return '"' + v.replace(/"/g, '""') + '"';
+  }
+
+  function exportVisibleCsv() {
+    var filtered = sortRecords(filterRecords());
+    var rows = [['Category', 'Subcategory', 'Vendor', 'Contact', 'Phone', 'Mobile', 'Email', 'Website', 'Offerings', 'Notes']];
+    for (var i = 0; i < filtered.length; i++) {
+      var r = filtered[i];
+      rows.push([
+        r.category,
+        r.subcategory,
+        r.vendor,
+        flattenField(r.contact),
+        flattenField(r.phone),
+        flattenField(r.mobile),
+        flattenField(r.email),
+        r.website,
+        offeringsText(r),
+        r.notes
+      ]);
+    }
+    var csv = rows.map(function(row) { return row.map(csvCell).join(','); }).join('\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'vendor-directory-visible.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   }
 
   populateFilters();
